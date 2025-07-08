@@ -1,172 +1,63 @@
--- Base64 decoder
 local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-local function decode(data)
-	data = string.gsub(data, '[^'..b..'=]', '')
-	return (data:gsub('.', function(x)
-		if x == '=' then return '' end
-		local r,f='',(b:find(x)-1)
-		for i=6,1,-1 do r = r .. (f % 2^i - f % 2^(i-1) > 0 and '1' or '0') end
-		return r
-	end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-		if #x ~= 8 then return '' end
-		local c=0
-		for i=1,8 do c = c + (x:sub(i,i)=='1' and 2^(8-i) or 0) end
-		return string.char(c)
-	end))
-end
+local function decode(d)d=string.gsub(d,'[^'..b..'=]','')return(d:gsub('.',function(x)if x=='='then return''end local r,f='',(b:find(x)-1)for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and'1'or'0')end return r end):gsub('%d%d%d?%d?%d?%d?%d?%d?',function(x)if#x~=8 then return''end local c=0 for i=1,8 do c=c+(x:sub(i,i)=='1'and 2^(8-i)or 0)end return string.char(c)end))end
 
--- Base64 Encoded URLs
-local encodedUrls = {
-	M1 = "aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L0x6NmZZYVNn", -- SmartPlantGui
-	M2 = "aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L21rSmczMUYw", -- AutoDropGui
-	M3 = "aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3LzZKeHdKUXRF", -- SimpleMiniGui
+local _={
+	M1="aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L0x6NmZZYVNn",
+	M2="aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L21rSmczMUYw",
+	M3="aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3LzZKeHdKUXRF"
 }
 
--- GUI Controller
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local s=game:GetService("CoreGui")
+local p=game:GetService("Players")
+local l=p.LocalPlayer
+local g=l:WaitForChild("PlayerGui")
 
-local miniGui = Instance.new("ScreenGui")
-miniGui.Name = "MiniController"
-miniGui.ResetOnSpawn = false
-miniGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-miniGui.Parent = CoreGui
+local f=Instance.new("ScreenGui")
+f.Name="MiniController"f.ResetOnSpawn=false f.ZIndexBehavior=Enum.ZIndexBehavior.Sibling f.Parent=s
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 60, 0, 30)
-frame.Position = UDim2.new(0, 10, 0, 10)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-frame.Parent = miniGui
+local b=Instance.new("Frame")b.Size=UDim2.new(0,60,0,30)b.Position=UDim2.new(0,10,0,10)b.BackgroundColor3=Color3.fromRGB(30,30,30)b.BorderSizePixel=0 b.Active=true b.Draggable=true b.Parent=f
 
-local eyeBtn = Instance.new("TextButton")
-eyeBtn.Size = UDim2.new(0.5, 0, 1, 0)
-eyeBtn.Text = "👑"
-eyeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-eyeBtn.TextColor3 = Color3.new(1, 1, 1)
-eyeBtn.Font = Enum.Font.GothamBold
-eyeBtn.TextSize = 16
-eyeBtn.Parent = frame
+local e=Instance.new("TextButton")e.Size=UDim2.new(0.5,0,1,0)e.Text="👑"e.BackgroundColor3=Color3.fromRGB(50,50,50)e.TextColor3=Color3.new(1,1,1)e.Font=Enum.Font.GothamBold e.TextSize=16 e.Parent=b
 
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0.5, 0, 1, 0)
-closeBtn.Position = UDim2.new(0.5, 0, 0, 0)
-closeBtn.Text = "❌"
-closeBtn.BackgroundColor3 = Color3.fromRGB(130, 30, 30)
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 16
-closeBtn.Parent = frame
+local x=Instance.new("TextButton")x.Size=UDim2.new(0.5,0,1,0)x.Position=UDim2.new(0.5,0,0,0)x.Text="❌"x.BackgroundColor3=Color3.fromRGB(130,30,30)x.TextColor3=Color3.new(1,1,1)x.Font=Enum.Font.GothamBold x.TextSize=16 x.Parent=b
 
-local menuBtn1 = Instance.new("TextButton")
-menuBtn1.Size = UDim2.new(0, 120, 0, 26)
-menuBtn1.Position = UDim2.new(0, 10, 0, 45)
-menuBtn1.Text = "FarmMethode"
-menuBtn1.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-menuBtn1.TextColor3 = Color3.new(1, 1, 1)
-menuBtn1.Font = Enum.Font.Gotham
-menuBtn1.TextSize = 13
-menuBtn1.Visible = false
-menuBtn1.Parent = miniGui
+local m1=Instance.new("TextButton")m1.Size=UDim2.new(0,120,0,26)m1.Position=UDim2.new(0,10,0,45)m1.Text="FarmMethode"m1.BackgroundColor3=Color3.fromRGB(80,80,80)m1.TextColor3=Color3.new(1,1,1)m1.Font=Enum.Font.Gotham m1.TextSize=13 m1.Visible=false m1.Parent=f
 
-local menuBtn2 = Instance.new("TextButton")
-menuBtn2.Size = UDim2.new(0, 120, 0, 26)
-menuBtn2.Position = UDim2.new(0, 10, 0, 75)
-menuBtn2.Text = "TrollMenu"
-menuBtn2.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-menuBtn2.TextColor3 = Color3.new(1, 1, 1)
-menuBtn2.Font = Enum.Font.Gotham
-menuBtn2.TextSize = 13
-menuBtn2.Visible = false
-menuBtn2.Parent = miniGui
+local m2=Instance.new("TextButton")m2.Size=UDim2.new(0,120,0,26)m2.Position=UDim2.new(0,10,0,75)m2.Text="TrollMenu"m2.BackgroundColor3=Color3.fromRGB(80,80,80)m2.TextColor3=Color3.new(1,1,1)m2.Font=Enum.Font.Gotham m2.TextSize=13 m2.Visible=false m2.Parent=f
 
-local menuBtn3 = Instance.new("TextButton")
-menuBtn3.Size = UDim2.new(0, 120, 0, 26)
-menuBtn3.Position = UDim2.new(0, 10, 0, 105)
-menuBtn3.Text = "Misc Menu"
-menuBtn3.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-menuBtn3.TextColor3 = Color3.new(1, 1, 1)
-menuBtn3.Font = Enum.Font.Gotham
-menuBtn3.TextSize = 13
-menuBtn3.Visible = false
-menuBtn3.Parent = miniGui
+local m3=Instance.new("TextButton")m3.Size=UDim2.new(0,120,0,26)m3.Position=UDim2.new(0,10,0,105)m3.Text="Misc Menu"m3.BackgroundColor3=Color3.fromRGB(80,80,80)m3.TextColor3=Color3.new(1,1,1)m3.Font=Enum.Font.Gotham m3.TextSize=13 m3.Visible=false m3.Parent=f
 
-local external1, external2, external3 = nil, nil, nil
-local loaded1, loaded2, loaded3 = false, false, false
+local a,b,c=nil,nil,nil local A,B,C=false,false,false
 
-eyeBtn.MouseButton1Click:Connect(function()
-	menuBtn1.Visible = not menuBtn1.Visible
-	menuBtn2.Visible = not menuBtn2.Visible
-	menuBtn3.Visible = not menuBtn3.Visible
-end)
+e.MouseButton1Click:Connect(function()m1.Visible=not m1.Visible m2.Visible=not m2.Visible m3.Visible=not m3.Visible end)
 
-closeBtn.MouseButton1Click:Connect(function()
-	if external1 then external1:Destroy() end
-	if external2 then external2:Destroy() end
-	if external3 then external3:Destroy() end
-	miniGui:Destroy()
-end)
+x.MouseButton1Click:Connect(function()if a then a:Destroy()end if b then b:Destroy()end if c then c:Destroy()end f:Destroy()end)
 
-menuBtn1.MouseButton1Click:Connect(function()
-	if not loaded1 then
-		local success, err = pcall(function()
-			loadstring(game:HttpGet(decode(encodedUrls.M1)))()
+local function toggle(btn,loaded,ext,name,url)
+	if not loaded then
+		local ok,err=pcall(function()
+			loadstring(game:HttpGet(decode(url)))()
 		end)
-		if success then
-			external1 = PlayerGui:WaitForChild("SmartPlantGui", 5)
-			if external1 then
-				loaded1 = true
-				menuBtn1.Text = "Hide"
+		if ok then
+			ext=g:WaitForChild(name,5)
+			if ext then
+				loaded=true
+				btn.Text="Hide"
 			end
-		else
-			warn("Gagal memuat Menu 1:", err)
-		end
+		else warn("Gagal memuat",name..":",err)end
 	else
-		external1.Enabled = not external1.Enabled
-		menuBtn1.Text = external1.Enabled and "Hide M1" or "Show M1"
+		ext.Enabled=not ext.Enabled
+		btn.Text=ext.Enabled and"Hide"..name or"Show"..name
 	end
-end)
+	return ext,loaded
+end
 
-menuBtn2.MouseButton1Click:Connect(function()
-	if not loaded2 then
-		local success, err = pcall(function()
-			loadstring(game:HttpGet(decode(encodedUrls.M2)))()
-		end)
-		if success then
-			external2 = PlayerGui:WaitForChild("AutoDropGui", 5)
-			if external2 then
-				loaded2 = true
-				menuBtn2.Text = "Hide"
-			end
-		else
-			warn("Gagal memuat Menu 2:", err)
-		end
-	else
-		external2.Enabled = not external2.Enabled
-		menuBtn2.Text = external2.Enabled and "Hide M2" or "Show M2"
-	end
+m1.MouseButton1Click:Connect(function()
+	a,A=toggle(m1,A,a,"SmartPlantGui",_.M1)
 end)
-
-menuBtn3.MouseButton1Click:Connect(function()
-	if not loaded3 then
-		local success, err = pcall(function()
-			loadstring(game:HttpGet(decode(encodedUrls.M3)))()
-		end)
-		if success then
-			external3 = PlayerGui:WaitForChild("SimpleMiniGui", 5)
-			if external3 then
-				loaded3 = true
-				menuBtn3.Text = "Hide"
-			end
-		else
-			warn("Gagal memuat Menu 3:", err)
-		end
-	else
-		external3.Enabled = not external3.Enabled
-		menuBtn3.Text = external3.Enabled and "Hide M3" or "Show M3"
-	end
+m2.MouseButton1Click:Connect(function()
+	b,B=toggle(m2,B,b,"AutoDropGui",_.M2)
+end)
+m3.MouseButton1Click:Connect(function()
+	c,C=toggle(m3,C,c,"SimpleMiniGui",_.M3)
 end)
