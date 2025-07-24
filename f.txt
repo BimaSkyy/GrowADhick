@@ -1,3 +1,95 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 
-cCcjvUhOFAxxeYZbLWNbESitArlUUWVz
+
+
+-- 📦 Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+
+-- 👤 Player dan komponen
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local ActivePetServiceRemote = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("ActivePetService")
+
+-- 🔄 Toggle
+local autoPetStickEnabled = false
+
+-- 🐾 Ambil semua UUID pet aktif
+local function getEquippedPetUUIDs()
+	local success, result = pcall(function()
+		local dataService = require(ReplicatedStorage.Modules:WaitForChild("DataService"))
+		local data = dataService:GetData()
+		if data and data.PetsData and data.PetsData.EquippedPets then
+			return data.PetsData.EquippedPets
+		end
+		return {}
+	end)
+	return success and result or {}
+end
+
+-- 📌 Paksa pet stay di posisi player
+local function forcePetsStick()
+	local uuids = getEquippedPetUUIDs()
+	local rootPart = Character:FindFirstChild("HumanoidRootPart")
+	if not rootPart then return end
+
+	for _, uuid in ipairs(uuids) do
+		pcall(function()
+			-- Set state Idle biar diem
+			ActivePetServiceRemote:FireServer("SetPetState", uuid, "Idle")
+			-- Paksa posisi ke karakter
+			ActivePetServiceRemote:FireServer("MoveTo", uuid, rootPart.Position)
+		end)
+	end
+end
+
+-- 🔁 Loop
+local function stickLoop()
+	while autoPetStickEnabled do
+		forcePetsStick()
+		task.wait(0.2)
+	end
+end
+
+-- 🎮 Respawn handler
+LocalPlayer.CharacterAdded:Connect(function(char)
+	Character = char
+	if autoPetStickEnabled then
+		task.wait(2)
+		stickLoop()
+	end
+end)
+
+-- 🧰 GUI tombol toggle
+local function createToggleButton()
+	local screenGui = Instance.new("ScreenGui", PlayerGui)
+	screenGui.Name = "PetStickControl"
+	screenGui.ResetOnSpawn = false
+
+	local button = Instance.new("TextButton")
+	button.Name = "TogglePetStick"
+	button.Size = UDim2.new(0, 100, 0, 40)
+	button.Position = UDim2.new(1, -110, 0, 60)
+	button.AnchorPoint = Vector2.new(0, 0)
+	button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.GothamBold
+	button.TextSize = 14
+	button.Text = "🐶 Stick OFF"
+	button.Parent = screenGui
+
+	button.MouseButton1Click:Connect(function()
+		autoPetStickEnabled = not autoPetStickEnabled
+		button.Text = autoPetStickEnabled and "🐶 Stick ON" or "🐶 Stick OFF"
+
+		if autoPetStickEnabled then
+			task.spawn(stickLoop)
+		end
+	end)
+end
+
+-- 🚀 Start
+createToggleButton()
